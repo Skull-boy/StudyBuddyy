@@ -1,4 +1,4 @@
-# Study Reminder App
+# Study Buddy
 
 A React-based study timer application with additional learning features to help you stay focused and productive while studying.
 
@@ -34,26 +34,31 @@ A React-based study timer application with additional learning features to help 
 - Direct links to relevant YouTube tutorials
 
 ## Technology Stack
-- React.js
+- React.js + Vite
+- TailwindCSS
 - lucide-react (for icons)
-- React Hooks:
-  - useState
-  - useEffect
+- React Hooks (useState, useEffect)
 
 ## Installation
 
-1. Ensure you have Node.js installed
-2. Install the required dependencies:
+1. Clone the repository:
    ```bash
-   npm install react lucide-react
+   git clone https://github.com/Skull-boy/StudyBuddyy.git
+   cd StudyBuddyy
+   ```
+
+2. Install dependencies:
+   ```bash
+   npm install
    ```
 
 ## Usage
 
 1. Start the development server:
    ```bash
-   npm start
+   npm run dev
    ```
+
 2. Use the timer controls:
    - Play/Pause: Start or pause the timer
    - Reset: Reset the current session
