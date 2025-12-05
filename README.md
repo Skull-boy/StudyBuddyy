@@ -1,74 +1,70 @@
 # Study Buddyy
 
-A React-based study timer application with additional learning features to help you stay focused and productive while studying.
+A React-based intelligent study companion designed to gamify your learning process and keep you focused. Features an AI Tutor, interactive study tools, and a beautiful Glassmorphism UI.
 
-## Features
+## ✨ Key Features
 
-### ⏱️ Study Timer
-- Customizable study sessions (default: 25 minutes)
-- Break timer (default: 5 minutes)
-- Start/Pause functionality
-- Reset option
-- Automatic break reminders
+### 🤖 AI Voice Tutor
+- **Interactive Voice Assistant**: Ask questions about programming concepts using voice commands.
+- **Smart Responses**: Get explanations for JavaScript, React, and CS concepts.
+- **Motivation**: Ask for a confidence boost when you're feeling stuck.
+- **Voice Controlled**: Start/stop timers and take breaks using voice commands.
 
-### 📚 Quiz Feature
-- Interactive programming-related questions
-- Multiple choice format
-- Topics include:
-  - JavaScript fundamentals
-  - Data Structures
-  - Algorithms
-  - CSS
-  - REST APIs
-- Score tracking
-- Immediate feedback
+### 🎮 Gamification & Progress
+- **XP System**: Earn XP for every minute studied and task completed.
+- **Level Up**: Progress through levels as you gain experience.
+- **Streaks**: Track your daily study consistency.
+- **Rewards**: Visual confetti celebrations for milestones.
 
-### 🎥 Educational Videos
-- Curated list of programming tutorials
-- Topics covered:
-  - JavaScript Basics
-  - Data Structures
-  - Algorithms
-  - Web Development
-  - React Fundamentals
-- Direct links to relevant YouTube tutorials
+### ⏱️ Smart Focus Timer
+- **Customizable Sessions**: Classic Pomodoro (25/5) or custom intervals.
+- **Auto-Transitions**: Seamlessly switches between study and break modes.
+- **Ambient Mode**: Built-in background sounds (Rain, Forest, Cafe, White Noise) to drown out distractions.
 
-## Technology Stack
-- React.js + Vite
-- TailwindCSS
-- lucide-react (for icons)
-- React Hooks (useState, useEffect)
+### 📝 Task Management
+- **Smart To-Do List**: Integrated task manager.
+- **XP Rewards**: Earn bonus XP for completing planned tasks.
 
-## Installation
+### 📚 Interactive Learning
+- **Tech Quizzes**: Test your knowledge in JS, CSS, React, and DSA.
+- **Curated Videos**: Access hand-picked coding tutorials directly in the app.
 
-1. Clone the repository:
-   ```bash
-   git clone https://github.com/fun-geek/StudyBuddyy.git
-   cd StudyBuddyy
-   ```
+## 🎨 UI/UX Design
+- **Glassmorphism**: Modern, translucent frosted-glass aesthetic.
+- **Dynamic Backgrounds**: Floating animated gradients that create a calming atmosphere.
+- **Smooth Animations**: Powered by Framer Motion for a premium feel.
 
-2. Install dependencies:
-   ```bash
-   npm install
-   ```
+## 🛠️ Technology Stack
+- **Core**: React.js + Vite
+- **Styling**: TailwindCSS
+- **Animations**: Framer Motion, Canvas Confetti
+- **Icons**: Lucide React
+- **Audio**: Web Speech API (Voice Recognition & Synthesis)
 
-## Usage
+## 🚀 Installation
 
-1. Start the development server:
-   ```bash
-   npm run dev
-   ```
+1.  **Clone the repository**:
+    ```bash
+    git clone https://github.com/fun-geek/StudyBuddyy.git
+    cd StudyBuddyy
+    ```
 
-2. Use the timer controls:
-   - Play/Pause: Start or pause the timer
-   - Reset: Reset the current session
-   - Switch between study and break modes automatically
+2.  **Install dependencies**:
+    ```bash
+    npm install
+    ```
 
-## Study Tips
-- Use the 25/5 minute Pomodoro technique for optimal focus
-- Take regular breaks to maintain productivity
-- Test your knowledge with the built-in quizzes
-- Watch tutorial videos during break times to reinforce learning
+3.  **Start the development server**:
+    ```bash
+    npm run dev
+    ```
 
-## Contributing
-Feel free to submit issues and enhancement requests!
+## 📖 Usage Guide
+
+1.  **Start Studying**: Click the play button or say "Start timer".
+2.  **Ask AI**: Click the microphone icon and say "What is a React Hook?" or "I need motivation".
+3.  **Level Up**: Watch your XP grow as you study and complete tasks.
+4.  **Stay Consistent**: Try to keep your daily streak alive!
+
+## 🤝 Contributing
+Contributions are welcome! Feel free to submit issues and enhancement requests.
