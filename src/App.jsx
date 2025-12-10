@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { StudyProvider } from './context/StudyContext';
 import Layout from './components/Layout/Layout';
 import Timer from './components/Features/Timer';
@@ -62,6 +62,10 @@ function Dashboard() {
 }
 
 export default function App() {
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
+
   return (
     <StudyProvider>
       <Layout>
