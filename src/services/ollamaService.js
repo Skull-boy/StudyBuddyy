@@ -4,7 +4,7 @@
  * IMPORTANT: Ollama must be started with OLLAMA_ORIGINS="*" to allow CORS.
  */
 
-const OLLAMA_API_URL = 'http://localhost:11434/api/chat';
+const OLLAMA_API_URL = '/api/ollama/chat';
 const MODEL_NAME = 'llama3.1';
 
 export const chatWithOllama = async (userMessage) => {

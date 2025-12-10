@@ -33,7 +33,7 @@ A React-based intelligent study companion designed to gamify your learning proce
 - **XP Rewards**: Earn bonus XP for completing planned tasks.
 
 ### 📚 Interactive Learning
-- **Tech Quizzes**: Test your knowledge in JS, CSS, React, and DSA.
+- **AI-Generated Quizzes**: Enter any topic (e.g., "Quantum Physics", "React Hooks") and generate an infinite number of unique quizzes instantly using the local AI.
 - **Curated Videos**: Access hand-picked coding tutorials directly in the app.
 
 ## 🛠️ Technology Stack
@@ -83,8 +83,16 @@ npm run dev
 
 1.  **Start Studying**: Click the play button or say "Start timer".
 2.  **Ask AI**: Click the microphone icon and say "What is a React Hook?" or "I need motivation".
-3.  **Change Atmosphere**: Use the Ambient player card to switch between Rain/Ambient sounds.
-4.  **Level Up**: Watch your XP grow as you study and complete tasks.
+3.  **Generate Quizzes**: Go to the Quiz section, type a topic, and press "Generate Quiz".
+4.  **Change Atmosphere**: Use the Ambient player card to switch between Rain/Ambient sounds.
+5.  **Level Up**: Watch your XP grow as you study and complete tasks.
+
+## ❓ Troubleshooting
+
+### Ollama Connection Failed?
+- Ensure Ollama is running (`ollama serve`).
+- Ensure you set the environment variable `$env:OLLAMA_ORIGINS="*"` (Windows) or `OLLAMA_ORIGINS="*"` (Mac/Linux) **before** starting the server.
+- Errors in the console? Check if your browser is blocking local requests (rare, but possible).
 
 ## 🤝 Contributing
 Contributions are welcome! Feel free to submit issues and enhancement requests.
