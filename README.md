@@ -10,31 +10,30 @@ A React-based intelligent study companion designed to gamify your learning proce
 - **Contextual Help**: Ask about programming concepts, get motivation, or request a joke.
 - **Smart Responses**: No API keys needed—just run your local model.
 
+### 🎴 AI Flashcards (NEW)
+- **Infinite Learning**: Generate flashcards on *any* topic instantly.
+- **Interactive UI**: 3D flip animations to test your memory.
+- **Smart Generation**: Powered by your local Ollama model.
+
+### 🎧 Soundscape Mixer (NEW)
+- **Custom Ambiance**: Mix multiple audio tracks to create your perfect focus environment.
+- **Volume Control**: Independently adjust "Rain" and "Ambient" levels.
+- **Persistent Settings**: Your volume preferences are saved automatically.
+
+### 📊 Interactive Analytics (NEW)
+- **Real-Time Tracking**: Every second of focus is recorded.
+- **Visual History**: View your study performance over the last 7 days.
+- **Daily Progress**: Watch your daily bar grow as you study.
+
+### 🧠 Smart Quizzes & Review (NEW)
+- **Infinite Quizzes**: Generate quizzes on any subject.
+- **Review Mode**: Learn from mistakes with **AI-generated explanations** for every answer.
+- **Gamified Results**: Earn XP based on your score.
+
 ### 🍱 Bento Grid Dashboard
 - **Modern Layout**: A structured, responsive grid layout for optimal organization.
 - **Consistent Design**: Glassmorphism cards with consistent sizing and alignment.
 - **Visual Clarity**: Timer, Stats, Tasks, and Quizzes arranged for easy access.
-
-### ⏱️ Smart Focus Timer
-- **Customizable Sessions**: Classic Pomodoro (25/5) or custom intervals.
-- **Auto-Transitions**: Seamlessly switches between study and break modes.
-- **Ambient Mode**: 
-  - **Multiple Tracks**: Switch between "Rain" and "Ambient" soundscapes.
-  - **Volume Control**: Adjustable background noise to drown out distractions.
-
-### 🎮 Gamification & Progress
-- **XP System**: Earn XP for every minute studied and task completed.
-- **Level Up**: Progress through levels as you gain experience.
-- **Streaks**: Track your daily study consistency.
-- **Rewards**: Visual confetti celebrations for milestones.
-
-### 📝 Task Management
-- **Smart To-Do List**: Integrated task manager.
-- **XP Rewards**: Earn bonus XP for completing planned tasks.
-
-### 📚 Interactive Learning
-- **AI-Generated Quizzes**: Enter any topic (e.g., "Quantum Physics", "React Hooks") and generate an infinite number of unique quizzes instantly using the local AI.
-- **Curated Videos**: Access hand-picked coding tutorials directly in the app.
 
 ## 🛠️ Technology Stack
 - **Core**: React.js + Vite
@@ -82,10 +81,10 @@ npm run dev
 ## 📖 Usage Guide
 
 1.  **Start Studying**: Click the play button or say "Start timer".
-2.  **Ask AI**: Click the microphone icon and say "What is a React Hook?" or "I need motivation".
-3.  **Generate Quizzes**: Go to the Quiz section, type a topic, and press "Generate Quiz".
-4.  **Change Atmosphere**: Use the Ambient player card to switch between Rain/Ambient sounds.
-5.  **Level Up**: Watch your XP grow as you study and complete tasks.
+2.  **Generate Flashcards**: Go to the Flashcards tab, type a topic (e.g., "Biology"), and start flipping!
+3.  **Mix Your Sound**: Click the music note icon to open the mixer and blend rain/ambient sounds.
+4.  **Take a Smart Quiz**: Generate a quiz, answer questions, and **Review** the explanations at the end.
+5.  **Track Progress**: Check the Analytics chart to see your weekly consistency.
 
 ## ❓ Troubleshooting
 
