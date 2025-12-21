@@ -1,25 +1,37 @@
 import React from 'react';
-import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Cell } from 'recharts';
+import { BarChart, Bar, XAxis, Tooltip, ResponsiveContainer, Cell } from 'recharts';
 import { Activity } from 'lucide-react';
-
-const data = [
-    { name: 'Mon', hours: 2.5 },
-    { name: 'Tue', hours: 3.8 },
-    { name: 'Wed', hours: 1.5 },
-    { name: 'Thu', hours: 4.2 },
-    { name: 'Fri', hours: 3.0 },
-    { name: 'Sat', hours: 5.5 },
-    { name: 'Sun', hours: 2.0 },
-];
+import { useStudy } from '../../context/StudyContext';
 
 export default function Stats() {
+    const { dailyStats } = useStudy();
+
+    // Generate last 7 days data
+    const data = Array.from({ length: 7 }, (_, i) => {
+        const d = new Date();
+        d.setDate(d.getDate() - (6 - i));
+        const dateKey = d.toLocaleDateString('en-CA');
+        const dayName = d.toLocaleDateString('en-US', { weekday: 'short' });
+
+        // Get seconds, convert to hours (stats stored in seconds)
+        // If undefined, 0
+        const seconds = dailyStats[dateKey] || 0;
+        const hours = parseFloat((seconds / 3600).toFixed(2));
+
+        return {
+            name: dayName,
+            fullDate: dateKey,
+            hours: hours
+        };
+    });
+
     return (
         <div className="bg-white/70 backdrop-blur-xl rounded-3xl p-6 shadow-xl border border-white/50 h-full flex flex-col">
             <h3 className="text-xl font-bold text-gray-800 mb-6 flex items-center gap-2">
                 <span className="bg-pink-100 p-2 rounded-lg text-pink-600">
                     <Activity className="w-5 h-5" />
                 </span>
-                Activity
+                Activity (Hours)
             </h3>
 
             <div className="flex-1 min-h-[200px]">
@@ -41,12 +53,13 @@ export default function Stats() {
                                 backgroundColor: 'rgba(255, 255, 255, 0.9)',
                                 backdropFilter: 'blur(8px)'
                             }}
+                            formatter={(value) => [`${value} hrs`, 'Study Time']}
                         />
                         <Bar dataKey="hours" radius={[6, 6, 6, 6]}>
                             {data.map((entry, index) => (
                                 <Cell
                                     key={`cell-${index}`}
-                                    fill={index === 5 ? '#8b5cf6' : '#c4b5fd'}
+                                    fill={index === 6 ? '#8b5cf6' : '#c4b5fd'}
                                 />
                             ))}
                         </Bar>

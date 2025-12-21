@@ -1,7 +1,7 @@
 
-const OLLAMA_URL = '/api/ollama/generate'; // Proxy handles the rest
-const OLLAMA_TAGS_URL = '/api/ollama/tags'; // For connectivity check
-const MODEL = 'llama3.1'; // Updated to match likely installed model
+const OLLAMA_URL = import.meta.env.VITE_OLLAMA_URL || '/api/ollama/generate';
+const OLLAMA_TAGS_URL = import.meta.env.VITE_OLLAMA_TAGS_URL || '/api/ollama/tags';
+const MODEL = import.meta.env.VITE_OLLAMA_MODEL || 'llama3.1';
 
 export const checkConnection = async () => {
     try {
@@ -20,25 +20,27 @@ export const generateQuizQuestions = async (topic) => {
     You are a quiz generator. Generate a JSON array of 5 multiple choice questions about "${topic}".
     
     The schema for each question must be:
-    {
-        "question": "string",
-        "options": ["string", "string", "string", "string"],
-        "correct": number (0-3 index of correct answer)
-    }
+        {
+            "question": "string",
+                "options": ["string", "string", "string", "string"],
+                    "correct": number(0 - 3 index of correct answer),
+                        "explanation": "string (Short explanation of why the correct answer is right)"
+        }
 
-    Return ONLY the raw JSON array. Do not wrap in markdown code blocks. Do not add any introductory text.
-    Example:
+    Return ONLY the raw JSON array.Do not wrap in markdown code blocks.Do not add any introductory text.
+        Example:
     [
         {
             "question": "What is 2+2?",
             "options": ["3", "4", "5", "6"],
-            "correct": 1
+            "correct": 1,
+            "explanation": "2 plus 2 equals 4."
         }
     ]
     `;
 
     try {
-        console.log(`Generating quiz for topic: ${topic}`);
+        console.log(`Generating quiz for topic: ${topic} `);
         const response = await fetch(OLLAMA_URL, {
             method: 'POST',
             headers: {
@@ -53,7 +55,7 @@ export const generateQuizQuestions = async (topic) => {
         });
 
         if (!response.ok) {
-            throw new Error(`Ollama API error: ${response.statusText}`);
+            throw new Error(`Ollama API error: ${response.statusText} `);
         }
 
         const data = await response.json();
@@ -103,6 +105,88 @@ export const generateQuizQuestions = async (topic) => {
 
     } catch (error) {
         console.error('Quiz Generation Error:', error);
+        throw error;
+    }
+};
+
+export const generateFlashcards = async (topic) => {
+    const prompt = `
+    You are a study aid generator.Generate a JSON array of 8 flashcards about "${topic}".
+    
+    The schema for each card must be:
+        {
+            "front": "string (Concept or Question)",
+                "back": "string (Definition or Answer)"
+        }
+
+    Return ONLY the raw JSON array.Do not wrap in markdown.
+        Example:
+    [
+        { "front": "Mitochondria", "back": "Powerhouse of the cell" }
+    ]
+    `;
+
+    try {
+        console.log(`Generating flashcards for: ${topic} `);
+        const response = await fetch(OLLAMA_URL, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                model: MODEL,
+                prompt: prompt,
+                stream: false,
+                format: "json"
+            }),
+        });
+
+        if (!response.ok) {
+            const errorText = await response.text();
+            console.error("Ollama API Error:", response.status, errorText);
+            throw new Error(`Ollama API error: ${response.status} ${response.statusText} `);
+        }
+
+        const data = await response.json();
+        console.log("Raw Ollama Flashcard Response:", data.response);
+
+        let parsedData;
+        try {
+            // 1. Try direct parsing
+            parsedData = JSON.parse(data.response);
+        } catch (e) {
+            console.warn("Direct JSON parse failed, trying regex fallback...");
+            // 2. Try to extract from markdown ```json ... ``` or just [...]
+            // Improved regex to handle newlines and potential markdown wrappers
+            const match = data.response.match(/\[[\s\S]*\]/);
+            if (match) {
+                try {
+                    parsedData = JSON.parse(match[0]);
+                } catch (pe) {
+                    console.error("Regex extract parse failed:", pe);
+                    throw new Error("Failed to extract valid JSON array");
+                }
+            } else {
+                throw new Error("No JSON array found in response");
+            }
+        }
+
+        if (Array.isArray(parsedData)) return parsedData;
+
+        // Handle case where it's wrapped in an object like { "flashcards": [...] }
+        if (parsedData && typeof parsedData === 'object') {
+            if (Array.isArray(parsedData.flashcards)) return parsedData.flashcards;
+            if (Array.isArray(parsedData.cards)) return parsedData.cards;
+            if (Array.isArray(parsedData.data)) return parsedData.data;
+
+            // Last ditch: find any array value
+            const anyArray = Object.values(parsedData).find(v => Array.isArray(v));
+            if (anyArray) return anyArray;
+        }
+
+        console.error("Parsed data structure invalid:", parsedData);
+        throw new Error("Invalid response format: Not an array");
+
+    } catch (error) {
+        console.error('Flashcard Generation Error:', error);
         throw error;
     }
 };

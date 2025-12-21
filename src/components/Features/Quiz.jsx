@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
-import { Brain, CheckCircle, XCircle, RefreshCw, ArrowRight, Loader2, Sparkles, BookOpen } from 'lucide-react';
+import { Brain, CheckCircle, XCircle, RefreshCw, ArrowRight, Loader2, Sparkles, BookOpen, AlertCircle } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import confetti from 'canvas-confetti';
 import { generateQuizQuestions } from '../../services/ollama';
+import { useStudy } from '../../context/StudyContext';
 
 const INITIAL_QUESTIONS = [
     {
@@ -13,7 +14,8 @@ const INITIAL_QUESTIONS = [
             "Creates a function",
             "Deletes a variable"
         ],
-        correct: 1
+        correct: 1,
+        explanation: "The const declaration creates block-scoped constants. The value of a constant can't be changed through reassignment."
     }
 ];
 
@@ -26,8 +28,12 @@ export default function Quiz() {
     const [selectedAnswer, setSelectedAnswer] = useState(null);
     const [showResult, setShowResult] = useState(false);
     const [score, setScore] = useState(0);
+    // Store user answers for review: { questionIndex: optionIndex }
+    const [userAnswers, setUserAnswers] = useState({});
     const [error, setError] = useState(null);
     const [debugStatus, setDebugStatus] = useState({ checked: false, ok: false, message: '' });
+
+    const { addQuizResult } = useStudy();
 
     // Auto-check connection on mount
     React.useEffect(() => {
@@ -69,6 +75,7 @@ export default function Quiz() {
                 setCurrentQuestion(0);
                 setScore(0);
                 setSelectedAnswer(null);
+                setUserAnswers({});
                 setShowResult(false);
             } else {
                 throw new Error("No questions generated (Empty response)");
@@ -83,6 +90,8 @@ export default function Quiz() {
     const handleAnswer = (index) => {
         setSelectedAnswer(index);
         setShowResult(true);
+        setUserAnswers(prev => ({ ...prev, [currentQuestion]: index }));
+
         if (index === questions[currentQuestion].correct) {
             setScore(s => s + 1);
             confetti({
@@ -101,6 +110,9 @@ export default function Quiz() {
             setShowResult(false);
         } else {
             setGameMode('result');
+            // Save Result to Context/LocalStorage
+            addQuizResult(score, questions.length, topic);
+
             if (score > questions.length / 2) {
                 confetti({
                     particleCount: 150,
@@ -116,6 +128,7 @@ export default function Quiz() {
         setSelectedAnswer(null);
         setShowResult(false);
         setScore(0);
+        setUserAnswers({});
         setGameMode('quiz');
     };
 
@@ -124,6 +137,7 @@ export default function Quiz() {
         setTopic('');
         setScore(0);
         setCurrentQuestion(0);
+        setUserAnswers({});
     };
 
     // --- RENDER: MENU ---
@@ -211,38 +225,79 @@ export default function Quiz() {
             <motion.div
                 initial={{ opacity: 0, scale: 0.9 }}
                 animate={{ opacity: 1, scale: 1 }}
-                className="bg-white/70 backdrop-blur-xl rounded-3xl p-8 shadow-xl border border-white/50 text-center h-full flex flex-col items-center justify-center"
+                className="bg-white/70 backdrop-blur-xl rounded-3xl p-8 shadow-xl border border-white/50 text-center h-full flex flex-col items-center overflow-auto"
             >
-                <div className="mb-6">
-                    <div className="w-24 h-24 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-full flex items-center justify-center mx-auto mb-4 shadow-lg shadow-indigo-200">
-                        <Trophy className="w-12 h-12 text-white" />
+                <div className="w-full max-w-2xl px-4 pb-8">
+                    <div className="mb-8">
+                        <div className="w-20 h-20 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-full flex items-center justify-center mx-auto mb-4 shadow-lg shadow-indigo-200">
+                            <Trophy className="w-10 h-10 text-white" />
+                        </div>
+                        <h3 className="text-2xl font-bold text-gray-800 mb-1">Quiz Complete!</h3>
+                        <p className="text-gray-600 text-lg">You scored <span className="font-bold text-indigo-600">{score}</span> out of {questions.length}</p>
                     </div>
-                    <h3 className="text-2xl font-bold text-gray-800 mb-2">Quiz Complete!</h3>
-                    <p className="text-gray-600">You scored {score} out of {questions.length}</p>
-                </div>
 
-                <div className="w-full bg-gray-200 h-4 rounded-full overflow-hidden mb-8 max-w-xs">
-                    <motion.div
-                        initial={{ width: 0 }}
-                        animate={{ width: `${(score / questions.length) * 100}%` }}
-                        className="h-full bg-gradient-to-r from-indigo-500 to-purple-500"
-                    />
-                </div>
+                    <div className="w-full bg-gray-200 h-3 rounded-full overflow-hidden mb-8">
+                        <motion.div
+                            initial={{ width: 0 }}
+                            animate={{ width: `${(score / questions.length) * 100}%` }}
+                            className="h-full bg-gradient-to-r from-indigo-500 to-purple-500"
+                        />
+                    </div>
 
-                <div className="flex gap-4">
-                    <button
-                        onClick={restartQuiz}
-                        className="px-6 py-3 bg-white text-indigo-600 border-2 border-indigo-100 rounded-xl hover:bg-indigo-50 transition-all font-medium"
-                    >
-                        Retry Same Quiz
-                    </button>
-                    <button
-                        onClick={returnToMenu}
-                        className="flex items-center gap-2 px-6 py-3 bg-indigo-600 text-white rounded-xl hover:bg-indigo-700 transition-all shadow-lg hover:shadow-indigo-200"
-                    >
-                        <RefreshCw className="w-5 h-5" />
-                        New Topic
-                    </button>
+                    {/* Review Section */}
+                    <div className="text-left space-y-6 mb-8">
+                        <h4 className="text-lg font-bold text-gray-800 border-b pb-2">Review Answers</h4>
+                        {questions.map((q, idx) => {
+                            const userAnsIdx = userAnswers[idx];
+                            const notAnswered = userAnsIdx === undefined || userAnsIdx === null;
+                            const isCorrect = userAnsIdx === q.correct;
+
+                            return (
+                                <div key={idx} className="bg-white/60 rounded-xl p-4 border border-indigo-50">
+                                    <div className="flex gap-3 mb-2">
+                                        <div className="mt-1">
+                                            {isCorrect ? <CheckCircle className="w-5 h-5 text-green-500" /> : <XCircle className="w-5 h-5 text-red-500" />}
+                                        </div>
+                                        <h5 className="font-medium text-gray-800">{q.question}</h5>
+                                    </div>
+
+                                    <div className="ml-8 text-sm space-y-1">
+                                        <p className={`${isCorrect ? 'text-green-700' : 'text-red-600 line-through opacity-70'}`}>
+                                            Your Answer: {notAnswered ? 'Skipped' : q.options[userAnsIdx]}
+                                        </p>
+                                        {!isCorrect && (
+                                            <p className="text-green-700 font-medium">
+                                                Correct Answer: {q.options[q.correct]}
+                                            </p>
+                                        )}
+
+                                        {q.explanation && (
+                                            <div className="mt-2 text-indigo-600 bg-indigo-50 p-2 rounded-lg flex items-start gap-2">
+                                                <AlertCircle className="w-4 h-4 mt-0.5 flex-shrink-0" />
+                                                <span>{q.explanation}</span>
+                                            </div>
+                                        )}
+                                    </div>
+                                </div>
+                            );
+                        })}
+                    </div>
+
+                    <div className="flex gap-4 justify-center sticky bottom-0 bg-white/0 pt-4">
+                        <button
+                            onClick={restartQuiz}
+                            className="px-6 py-3 bg-white text-indigo-600 border-2 border-indigo-100 rounded-xl hover:bg-indigo-50 transition-all font-medium"
+                        >
+                            Retry Quiz
+                        </button>
+                        <button
+                            onClick={returnToMenu}
+                            className="flex items-center gap-2 px-6 py-3 bg-indigo-600 text-white rounded-xl hover:bg-indigo-700 transition-all shadow-lg hover:shadow-indigo-200"
+                        >
+                            <RefreshCw className="w-5 h-5" />
+                            New Topic
+                        </button>
+                    </div>
                 </div>
             </motion.div>
         );
@@ -250,6 +305,22 @@ export default function Quiz() {
 
     // --- RENDER: PLAYING ---
     const question = questions[currentQuestion];
+
+    if (!question) {
+        return (
+            <div className="bg-white/70 backdrop-blur-xl rounded-3xl p-8 shadow-xl border border-white/50 h-full flex flex-col items-center justify-center text-center">
+                <AlertCircle className="w-16 h-16 text-yellow-500 mb-4" />
+                <h3 className="text-xl font-bold text-gray-800 mb-2">Something went wrong</h3>
+                <p className="text-gray-600 mb-6">We couldn't load the question data properly.</p>
+                <button
+                    onClick={returnToMenu}
+                    className="px-6 py-3 bg-indigo-600 text-white rounded-xl hover:bg-indigo-700 transition-all font-medium"
+                >
+                    Return to Menu
+                </button>
+            </div>
+        );
+    }
 
     return (
         <div className="bg-white/70 backdrop-blur-xl rounded-3xl p-6 shadow-xl border border-white/50 h-full flex flex-col">
@@ -268,11 +339,11 @@ export default function Quiz() {
 
             <div className="flex-1 flex flex-col justify-center">
                 <h4 className="text-lg font-semibold text-gray-800 mb-6 leading-relaxed">
-                    {question.question}
+                    {question.question || "Question text missing"}
                 </h4>
 
                 <div className="space-y-3">
-                    {question.options.map((option, idx) => {
+                    {(question.options || []).map((option, idx) => {
                         let stateStyle = "border-gray-200 hover:border-indigo-300 hover:bg-indigo-50";
                         if (showResult) {
                             if (idx === question.correct) stateStyle = "border-green-500 bg-green-50 text-green-700";

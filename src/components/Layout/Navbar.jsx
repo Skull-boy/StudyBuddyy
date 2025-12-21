@@ -1,21 +1,55 @@
 import React from 'react';
-import { Trophy, Flame, Star, BookOpen } from 'lucide-react';
+import { Trophy, Flame, Star, BookOpen, LayoutDashboard, ListTodo, Layers } from 'lucide-react';
 import { useStudy } from '../../context/StudyContext';
 import { motion } from 'framer-motion';
+import { Link, useLocation } from 'react-router-dom';
 
 export default function Navbar() {
     const { level, xp, streak } = useStudy();
+    const location = useLocation();
+
+    const isActive = (path) => location.pathname === path ? "bg-indigo-100 text-indigo-700" : "text-gray-600 hover:bg-white/40";
 
     return (
         <nav className="bg-white/10 backdrop-blur-md border-b border-white/20 p-4 sticky top-0 z-50">
             <div className="max-w-7xl mx-auto flex justify-between items-center">
-                <div className="flex items-center gap-3">
-                    <div className="bg-gradient-to-br from-indigo-500 to-purple-600 p-2 rounded-xl shadow-lg shadow-indigo-500/20">
-                        <BookOpen className="w-6 h-6 text-white" />
+                <div className="flex items-center gap-6">
+                    <Link to="/" className="flex items-center gap-3">
+                        <div className="bg-gradient-to-br from-indigo-500 to-purple-600 p-2 rounded-xl shadow-lg shadow-indigo-500/20">
+                            <BookOpen className="w-6 h-6 text-white" />
+                        </div>
+                        <h1 className="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-indigo-600 to-purple-600 hidden sm:block">
+                            StudyBuddyy
+                        </h1>
+                    </Link>
+
+                    {/* Navigation Links */}
+                    <div className="hidden md:flex items-center gap-2">
+                        <Link to="/" className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${isActive('/')}`}>
+                            <span className="flex items-center gap-2">
+                                <LayoutDashboard className="w-4 h-4" />
+                                Dashboard
+                            </span>
+                        </Link>
+                        <Link to="/quiz" className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${isActive('/quiz')}`}>
+                            <span className="flex items-center gap-2">
+                                <BookOpen className="w-4 h-4" />
+                                Quiz
+                            </span>
+                        </Link>
+                        <Link to="/tasks" className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${isActive('/tasks')}`}>
+                            <span className="flex items-center gap-2">
+                                <ListTodo className="w-4 h-4" />
+                                Tasks
+                            </span>
+                        </Link>
+                        <Link to="/flashcards" className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${isActive('/flashcards')}`}>
+                            <span className="flex items-center gap-2">
+                                <Layers className="w-4 h-4" />
+                                Flashcards
+                            </span>
+                        </Link>
                     </div>
-                    <h1 className="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-indigo-600 to-purple-600 hidden sm:block">
-                        StudyBuddyy
-                    </h1>
                 </div>
 
                 <div className="flex items-center gap-4 sm:gap-6">

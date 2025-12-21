@@ -22,17 +22,36 @@ export const StudyProvider = ({ children }) => {
   // Tasks
   const [tasks, setTasks] = useState(() => JSON.parse(localStorage.getItem('tasks')) || []);
 
-  // Audio
-  const [isAmbientPlaying, setIsAmbientPlaying] = useState(false);
-  const [volume, setVolume] = useState(0.5);
+  // Quiz History
+  const [quizHistory, setQuizHistory] = useState(() => JSON.parse(localStorage.getItem('quizHistory')) || []);
 
-  // Persist Stats
+  // Ambient Sound State
+  const [isAmbientPlaying, setIsAmbientPlaying] = useState(false);
+  const [soundVolumes, setSoundVolumes] = useState(() =>
+    JSON.parse(localStorage.getItem('soundVolumes')) || { rain: 0.5, ambient: 0.5 }
+  );
+
+  // Analytics State
+  const [dailyStats, setDailyStats] = useState(() => JSON.parse(localStorage.getItem('dailyStats')) || {});
+
+  const updateTrackVolume = (trackId, val) => {
+    setSoundVolumes(prev => ({ ...prev, [trackId]: val }));
+  };
+
+  // Persist User Stats (Frequent Updates)
   useEffect(() => {
     localStorage.setItem('studyXP', xp);
     localStorage.setItem('studyLevel', level);
     localStorage.setItem('studyStreak', streak);
+    localStorage.setItem('dailyStats', JSON.stringify(dailyStats));
+  }, [xp, level, streak, dailyStats]);
+
+  // Persist Tasks & History (Infrequent Updates)
+  useEffect(() => {
     localStorage.setItem('tasks', JSON.stringify(tasks));
-  }, [xp, level, streak, tasks]);
+    localStorage.setItem('quizHistory', JSON.stringify(quizHistory));
+    localStorage.setItem('soundVolumes', JSON.stringify(soundVolumes));
+  }, [tasks, quizHistory, soundVolumes]);
 
   // Level Up Logic
   useEffect(() => {
@@ -53,9 +72,16 @@ export const StudyProvider = ({ children }) => {
     if (isRunning && currentTime > 0) {
       interval = setInterval(() => {
         setCurrentTime(prev => prev - 1);
-        // Gain XP for studying
+        // Gain XP for studying & Track Stats
         if (isStudying) {
           setXp(prev => prev + 1); // 1 XP per second of study
+
+          // Update Daily Stats (Seconds)
+          const todayKey = new Date().toLocaleDateString('en-CA'); // YYYY-MM-DD
+          setDailyStats(prev => ({
+            ...prev,
+            [todayKey]: (prev[todayKey] || 0) + 1
+          }));
         }
       }, 1000);
     } else if (currentTime === 0) {
@@ -64,7 +90,7 @@ export const StudyProvider = ({ children }) => {
         setIsStudying(false);
         setCurrentTime(breakTime);
         updateStreak();
-        new Audio('/sounds/success.mp3').play().catch(() => {}); // Simple notification
+        new Audio('/sounds/success.mp3').play().catch(() => { }); // Simple notification
       } else {
         setIsStudying(true);
         setCurrentTime(studyTime);
@@ -114,6 +140,27 @@ export const StudyProvider = ({ children }) => {
     setTasks(tasks.filter(task => task.id !== id));
   };
 
+  const addQuizResult = (score, total, topic) => {
+    const newResult = {
+      id: Date.now(),
+      date: new Date().toISOString(),
+      score,
+      total,
+      topic
+    };
+    setQuizHistory([newResult, ...quizHistory]);
+    // Gain XP based on score
+    const xpGain = score * 20;
+    if (xpGain > 0) {
+      setXp(prev => prev + xpGain);
+      confetti({
+        particleCount: score * 10,
+        spread: 60,
+        origin: { y: 0.6 }
+      });
+    }
+  };
+
   const formatTime = (seconds) => {
     const mins = Math.floor(seconds / 60);
     const secs = seconds % 60;
@@ -129,8 +176,10 @@ export const StudyProvider = ({ children }) => {
       isRunning, setIsRunning,
       xp, level, streak,
       tasks, addTask, toggleTask, deleteTask,
+      quizHistory, addQuizResult,
       isAmbientPlaying, setIsAmbientPlaying,
-      volume, setVolume,
+      soundVolumes, updateTrackVolume,
+      dailyStats,
       formatTime
     }}>
       {children}
